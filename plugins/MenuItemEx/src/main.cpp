@@ -11,11 +11,13 @@
 #define MS_COPYIP     "MenuEx/CopyIP"
 #define MS_COPYMIRVER "MenuEx/CopyMirVer"
 #define MS_OPENIGNORE "MenuEx/OpenIgnoreOptions"
+#define MS_NOTIFY     "MenuEx/NotifyOnline" // ike tool
 
 const int vf_default = VF_VS | VF_HFL | VF_IGN | VF_CID | VF_SHOWID | VF_RECV | VF_STAT | VF_SMNAME | VF_CIDN | VF_CIP;
 
 HGENMENU hmenuVis, hmenuOff, hmenuHide, hmenuIgnore, hmenuProto;
 HGENMENU hmenuCopyID, hmenuRecvFiles, hmenuStatusMsg, hmenuCopyIP, hmenuCopyMirVer;
+HGENMENU hmenuNotify;
 static HGENMENU hIgnoreItem[9], hProtoItem[MAX_PROTOS];
 HICON hIcons[5];
 PROTOACCOUNT **accs;
@@ -191,7 +193,7 @@ static void RenameDbProto(MCONTACT hContact, MCONTACT hContactNew, char* oldName
 	FreeModuleSettingLL(&settinglist);
 } // end code from dbe++
 
-static void ShowPopup(const wchar_t *pwszText, MCONTACT hContact)
+static void ShowPopup(const wchar_t *pwszText, MCONTACT hContact, int time)
 {
 	if (!pwszText) return;
 
@@ -200,8 +202,32 @@ static void ShowPopup(const wchar_t *pwszText, MCONTACT hContact)
 	ppd.lchContact = hContact;
 	wcsncpy(ppd.lpwzContactName, Clist_GetContactDisplayName(hContact), MAX_CONTACTNAME - 1);
 	wcsncpy(ppd.lpwzText, pwszText, MAX_SECONDLINE - 1);
-	ppd.iSeconds = -1;
+	ppd.iSeconds = time;
 	PUAddPopupW(&ppd);
+}
+
+static void ShowPopup(const wchar_t *pwszText, MCONTACT hContact)
+{
+	ShowPopup(pwszText, hContact, -1);
+}
+
+INT_PTR onNotify(WPARAM wparam, LPARAM) // ike tool
+{
+
+	if (db_get_b((MCONTACT)wparam, "NewStatusNotify", "EnablePopups", 0) == 1) {
+		db_unset((MCONTACT)wparam, "NewStatusNotify", "EnablePopups");
+		db_unset((MCONTACT)wparam, "NewStatusNotify", "EnableSounds");
+		db_unset((MCONTACT)wparam, "NewStatusNotify", "EnableXStatusNotify");
+		db_unset((MCONTACT)wparam, "NewStatusNotify", "EnableLogging");
+
+		ShowPopup(L"Oznamování vypnuto", (MCONTACT)wparam, 2);
+	}
+	else {
+		db_set_b((MCONTACT)wparam, "NewStatusNotify", "EnablePopups", 1);
+		ShowPopup(L"Oznamování zapnuto", (MCONTACT)wparam, 2);
+	}
+
+	return 0;
 }
 
 BOOL DirectoryExists(MCONTACT hContact)
@@ -912,6 +938,7 @@ static int PluginInit(WPARAM, LPARAM)
 	mi.hIcolibItem = nullptr;
 	hmenuStatusMsg = Menu_AddContactMenuItem(&mi);
 
+
 	SET_UID(mi, 0x3847bfcd, 0xfcd5, 0x4435, 0xa6, 0x54, 0x2e, 0x9, 0xc5, 0xba, 0xcf, 0x71);
 	mi.position++;
 	mi.name.w = LPGENW("Copy IP");
@@ -923,6 +950,12 @@ static int PluginInit(WPARAM, LPARAM)
 	mi.name.w = LPGENW("Copy MirVer");
 	mi.pszService = MS_COPYMIRVER;
 	hmenuCopyMirVer = Menu_AddContactMenuItem(&mi);
+
+	SET_UID(mi, 0x7c6ad48, 0x882d, 0x47ed, 0xa6, 0x6e, 0xba, 0x26, 0xa3, 0x50, 0x17, 0x83);
+	mi.pszService = MS_NOTIFY;
+	mi.name.w = LPGENW("Online notification");
+	mi.position++;
+	hmenuNotify = Menu_AddContactMenuItem(&mi);
 
 	hIcons[0] = g_plugin.getIcon(IDI_MIRVER);
 	hIcons[1] = g_plugin.getIcon(IDI_VISIBLE);
@@ -953,6 +986,7 @@ int CMPlugin::Load()
 	CreateServiceFunction(MS_COPYIP, onCopyIP);
 	CreateServiceFunction(MS_COPYMIRVER, onCopyMirVer);
 	CreateServiceFunction(MS_OPENIGNORE, OpenIgnoreOptions);
+	CreateServiceFunction(MS_NOTIFY, onNotify); // ike tool
 
 	HookEvent(ME_SYSTEM_MODULESLOADED, PluginInit);
 	HookEvent(ME_CLIST_PREBUILDCONTACTMENU, BuildMenu);
