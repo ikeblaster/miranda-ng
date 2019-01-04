@@ -617,7 +617,7 @@ static int TSAPI SetupIconLibConfig()
 	sid.iDefaultIndex = -IDI_CLOCK;
 	g_plugin.addIcon(&sid);
 
-	wcsncpy(szFilename, L"plugins\\tabsrmm.dll", MAX_PATH);
+	wcsncpy(szFilename, L"plugins\\_tabsrmm.dll", MAX_PATH);
 
 	sid.pszName = "tabSRMM_overlay_disabled";
 	sid.description.a = LPGEN("Feature disabled (used as overlay)");
