@@ -179,8 +179,8 @@ INT_PTR CALLBACK DlgProcSoundUIPage(HWND hwndDlg, UINT msg, WPARAM wParam, LPARA
 				}
 			}
 
-			CheckDlgButton(hwndDlg, IDC_CHECK_NOTIFYSOUNDS, g_plugin.getByte(hContact, "EnableSounds", 1) ? BST_CHECKED : BST_UNCHECKED);
-			CheckDlgButton(hwndDlg, IDC_CHECK_NOTIFYPOPUPS, g_plugin.getByte(hContact, "EnablePopups", 1) ? BST_CHECKED : BST_UNCHECKED);
+			CheckDlgButton(hwndDlg, IDC_CHECK_NOTIFYSOUNDS, g_plugin.getByte(hContact, "EnableSounds", 0) ? BST_CHECKED : BST_UNCHECKED);
+			CheckDlgButton(hwndDlg, IDC_CHECK_NOTIFYPOPUPS, g_plugin.getByte(hContact, "EnablePopups", 0) ? BST_CHECKED : BST_UNCHECKED);
 
 			ShowWindow(GetDlgItem(hwndDlg, IDC_INDSNDLIST), opt.UseIndSnd ? SW_SHOW : SW_HIDE);
 			ShowWindow(GetDlgItem(hwndDlg, IDC_TEXT_ENABLE_IS), opt.UseIndSnd ? SW_HIDE : SW_SHOW);
@@ -306,12 +306,12 @@ void SetAllContactsIcons(HWND hwndList)
 		if (hItem) {
 			char *szProto = GetContactProto(hContact);
 			if (szProto) {
-				EnableSounds = g_plugin.getByte(hContact, "EnableSounds", 1);
-				EnablePopups = g_plugin.getByte(hContact, "EnablePopups", 1);
-				EnableXStatus = g_plugin.getByte(hContact, "EnableXStatusNotify", 1);
-				EnableXLogging = g_plugin.getByte(hContact, "EnableXLogging", 1);
-				EnableStatusMsg = g_plugin.getByte(hContact, "EnableSMsgNotify", 1);
-				EnableSMsgLogging = g_plugin.getByte(hContact, "EnableSMsgLogging", 1);
+				EnableSounds = g_plugin.getByte(hContact, "EnableSounds", 0);
+				EnablePopups = g_plugin.getByte(hContact, "EnablePopups", 0);
+				EnableXStatus = g_plugin.getByte(hContact, "EnableXStatusNotify", 0);
+				EnableXLogging = g_plugin.getByte(hContact, "EnableXLogging", 0);
+				EnableStatusMsg = g_plugin.getByte(hContact, "EnableSMsgNotify", 0);
+				EnableSMsgLogging = g_plugin.getByte(hContact, "EnableSMsgLogging", 0);
 			}
 			else
 				EnableSounds = EnablePopups = EnableXStatus = EnableXLogging = EnableStatusMsg = EnableSMsgLogging = 0;
@@ -545,35 +545,35 @@ INT_PTR CALLBACK DlgProcFiltering(HWND hwndDlg, UINT msg, WPARAM, LPARAM lParam)
 				for (auto &hContact : Contacts()) {
 					HANDLE hItem = (HANDLE)SendMessage(hList, CLM_FINDCONTACT, hContact, 0);
 					if (hItem) {
-						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_SOUND) == EXTRA_IMAGE_SOUND)
+						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_SOUND) != EXTRA_IMAGE_SOUND)
 							g_plugin.delSetting(hContact, "EnableSounds");
 						else
-							g_plugin.setByte(hContact, "EnableSounds", 0);
+							g_plugin.setByte(hContact, "EnableSounds", 1);
 
-						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_POPUP) == EXTRA_IMAGE_POPUP)
+						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_POPUP) != EXTRA_IMAGE_POPUP)
 							g_plugin.delSetting(hContact, "EnablePopups");
 						else
-							g_plugin.setByte(hContact, "EnablePopups", 0);
+							g_plugin.setByte(hContact, "EnablePopups", 1);
 
-						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_XSTATUS) == EXTRA_IMAGE_XSTATUS)
+						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_XSTATUS) != EXTRA_IMAGE_XSTATUS)
 							g_plugin.delSetting(hContact, "EnableXStatusNotify");
 						else
-							g_plugin.setByte(hContact, "EnableXStatusNotify", 0);
+							g_plugin.setByte(hContact, "EnableXStatusNotify", 1);
 
-						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_XLOGGING) == EXTRA_IMAGE_XLOGGING)
+						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_XLOGGING) != EXTRA_IMAGE_XLOGGING)
 							g_plugin.delSetting(hContact, "EnableXLogging");
 						else
-							g_plugin.setByte(hContact, "EnableXLogging", 0);
+							g_plugin.setByte(hContact, "EnableXLogging", 1);
 
-						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_STATUSMSG) == EXTRA_IMAGE_STATUSMSG)
+						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_STATUSMSG) != EXTRA_IMAGE_STATUSMSG)
 							g_plugin.delSetting(hContact, "EnableSMsgNotify");
 						else
-							g_plugin.setByte(hContact, "EnableSMsgNotify", 0);
+							g_plugin.setByte(hContact, "EnableSMsgNotify", 1);
 
-						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_SMSGLOGGING) == EXTRA_IMAGE_SMSGLOGGING)
+						if (GetExtraImage(hList, hItem, EXTRA_IMAGE_SMSGLOGGING) != EXTRA_IMAGE_SMSGLOGGING)
 							g_plugin.delSetting(hContact, "EnableSMsgLogging");
 						else
-							g_plugin.setByte(hContact, "EnableSMsgLogging", 0);
+							g_plugin.setByte(hContact, "EnableSMsgLogging", 1);
 					}
 				}
 				return TRUE;

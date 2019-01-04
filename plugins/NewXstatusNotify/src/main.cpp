@@ -424,7 +424,7 @@ int ContactStatusChanged(MCONTACT hContact, WORD oldStatus, WORD newStatus)
 		bEnablePopup = g_plugin.getByte(statusIDp, 1) ? FALSE : TRUE;
 	}
 
-	if (bEnablePopup && g_plugin.getByte(hContact, "EnablePopups", 1) && !opt.TempDisabled) {
+	if (bEnablePopup && g_plugin.getByte(hContact, "EnablePopups", 0) && !opt.TempDisabled) {
 		int wStatus = Proto_GetStatus(szProto);
 		wchar_t str[MAX_SECONDLINE] = { 0 };
 		if (opt.ShowStatus)
@@ -448,7 +448,7 @@ int ContactStatusChanged(MCONTACT hContact, WORD oldStatus, WORD newStatus)
 		BlinkIcon(hContact, hIcon, str);
 	}
 
-	if (bEnableSound && db_get_b(0, "Skin", "UseSound", TRUE) && g_plugin.getByte(hContact, "EnableSounds", 1) && !opt.TempDisabled) {
+	if (bEnableSound && db_get_b(0, "Skin", "UseSound", TRUE) && g_plugin.getByte(hContact, "EnableSounds", 0) && !opt.TempDisabled) {
 		if (oldStatus == ID_STATUS_OFFLINE)
 			PlayChangeSound(hContact, StatusListEx[ID_STATUS_FROMOFFLINE].lpzSkinSoundName);
 		else
@@ -643,7 +643,7 @@ int ProcessStatusMessage(DBCONTACTWRITESETTING *cws, MCONTACT hContact)
 	}
 
 	// check per-contact ignored events
-	if (g_plugin.getByte(hContact, "EnableSMsgNotify", 1) == 0)
+	if (g_plugin.getByte(hContact, "EnableSMsgNotify", 0) == 0)
 		bEnableSound = bEnablePopup = false;
 
 	// we're offline or just connecting
@@ -681,7 +681,7 @@ int ProcessStatusMessage(DBCONTACTWRITESETTING *cws, MCONTACT hContact)
 	if (g_plugin.getByte(szProto, 1) == 0 && !opt.PSMsgOnConnect)
 		bEnablePopup = false;
 
-	if (bEnablePopup && g_plugin.getByte(hContact, "EnablePopups", 1) && !opt.TempDisabled) {
+	if (bEnablePopup && g_plugin.getByte(hContact, "EnablePopups", 0) && !opt.TempDisabled) {
 		// cut message if needed
 		wchar_t *copyText = nullptr;
 		if (opt.PSMsgTruncate && (opt.PSMsgLen > 0) && smi.newstatusmsg && (mir_wstrlen(smi.newstatusmsg) > opt.PSMsgLen)) {
@@ -738,18 +738,18 @@ int ProcessStatusMessage(DBCONTACTWRITESETTING *cws, MCONTACT hContact)
 		BlinkIcon(hContact, hIcon, str);
 	}
 
-	if (bEnableSound && db_get_b(0, "Skin", "UseSound", TRUE) && g_plugin.getByte(hContact, "EnableSounds", 1) && !opt.TempDisabled) {
+	if (bEnableSound && db_get_b(0, "Skin", "UseSound", TRUE) && g_plugin.getByte(hContact, "EnableSounds", 0) && !opt.TempDisabled) {
 		if (smi.compare == COMPARE_DEL)
 			PlayChangeSound(hContact, StatusListEx[ID_STATUS_SMSGREMOVED].lpzSkinSoundName);
 		else
 			PlayChangeSound(hContact, StatusListEx[ID_STATUS_SMSGCHANGED].lpzSkinSoundName);
 	}
 
-	BOOL bEnableLog = opt.SMsgLogToDB && g_plugin.getByte(hContact, "EnableSMsgLogging", 1);
+	BOOL bEnableLog = opt.SMsgLogToDB && g_plugin.getByte(hContact, "EnableSMsgLogging", 0);
 	if (bEnableLog && (!opt.SMsgLogToDB_WinOpen || CheckMsgWnd(hContact)))
 		LogSMsgToDB(&smi, smi.compare == COMPARE_DEL ? templates.LogSMsgRemoved : templates.LogSMsgChanged);
 
-	if (opt.SMsgLogToFile && g_plugin.getByte(hContact, "EnableSMsgLogging", 1)) {
+	if (opt.SMsgLogToFile && g_plugin.getByte(hContact, "EnableSMsgLogging", 0)) {
 		wchar_t stzDate[MAX_STATUSTEXT], stzTime[MAX_STATUSTEXT], stzText[MAX_TEXT_LEN];
 
 		GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, L"HH':'mm", stzTime, _countof(stzTime));
