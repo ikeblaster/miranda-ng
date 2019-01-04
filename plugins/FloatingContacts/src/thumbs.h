@@ -51,6 +51,7 @@ public:
 	void OnTimer(BYTE idTimer);
 };
 
+TCHAR *FirstWord(TCHAR* text);
 void UndockThumbs(ThumbInfo *pThumb1, ThumbInfo *pThumb2);
 void DockThumbs(ThumbInfo *pThumbLeft, ThumbInfo *pThumbRight);
 

@@ -404,6 +404,7 @@ static LRESULT __stdcall CommWndProc(HWND	hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	case WM_REFRESH_CONTACT:
 		if (pThumb) {
 			wcsncpy(pThumb->ptszName, Clist_GetContactDisplayName(pThumb->hContact), USERNAME_LEN - 1);
+            FirstWord(pThumb->ptszName);
 			pThumb->RefreshContactStatus((int)lParam);
 			pThumb->ResizeThumb();
 		}

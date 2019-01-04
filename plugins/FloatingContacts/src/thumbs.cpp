@@ -728,6 +728,15 @@ void UndockThumbs(ThumbInfo *pThumb1, ThumbInfo *pThumb2)
 		pThumb2->dockOpt.hwndLeft = nullptr;
 }
 
+// IKE TOOL
+wchar_t *FirstWord(wchar_t *text) {
+	wchar_t *p = wcschr(text, ' ');
+	if(p != NULL) *p = '\0';
+
+	return text;
+}
+
+
 /////////////////////////////////////////////////////////////////////////////
 // ThumbList
 
@@ -744,6 +753,7 @@ ThumbInfo *ThumbList::AddThumb(HWND hwnd, wchar_t *ptszName, MCONTACT hContact)
 
 	ThumbInfo *pThumb = new ThumbInfo;
 	wcsncpy_s(pThumb->ptszName, ptszName, _TRUNCATE);
+    FirstWord(pThumb->ptszName);
 	pThumb->hContact = hContact;
 	pThumb->hwnd = hwnd;
 
